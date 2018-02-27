@@ -11,8 +11,8 @@ contract ColorsERC721 is ERC721Token, Ownable {
 
   mapping(uint => uint) tokenToPriceMap;
 
-  modifier onlyMintedTokens(uint colorId) {
-    require(tokenToPriceMap[colorId] != 0);
+  modifier onlyMintedTokens(uint _colorId) {
+    require(tokenToPriceMap[_colorId] != 0);
     _;
   }
 
@@ -28,10 +28,10 @@ contract ColorsERC721 is ERC721Token, Ownable {
     return SYMBOL;
   }
 
-  function mint(uint colorId) public payable {
+  function mint(uint _colorId) public payable {
     require(msg.value >= PRICE);
-    _mint(msg.sender, colorId);
-    tokenToPriceMap[colorId] = PRICE;
+    _mint(msg.sender, _colorId);
+    tokenToPriceMap[_colorId] = PRICE;
 
     if (msg.value > PRICE) {
       uint priceExcess = msg.value - PRICE;
@@ -39,15 +39,15 @@ contract ColorsERC721 is ERC721Token, Ownable {
     }
   }
 
-  function claim(uint colorId) public payable onlyMintedTokens(colorId) {
-    uint askingPrice = getClaimingPrice(colorId);
+  function claim(uint _colorId) public payable onlyMintedTokens(_colorId) {
+    uint askingPrice = getClaimingPrice(_colorId);
     require(msg.value >= askingPrice);
-    clearApprovalAndTransfer(ownerOf(colorId), msg.sender, colorId);
-    tokenToPriceMap[colorId] = askingPrice;
+    clearApprovalAndTransfer(ownerOf(_colorId), msg.sender, _colorId);
+    tokenToPriceMap[_colorId] = askingPrice;
   }
 
-  function getClaimingPrice(uint colorId) public view onlyMintedTokens(colorId) returns(uint) {
-    uint oldPrice = tokenToPriceMap[colorId];
+  function getClaimingPrice(uint _colorId) public view onlyMintedTokens(_colorId) returns(uint) {
+    uint oldPrice = tokenToPriceMap[_colorId];
     uint newPrice = (oldPrice * 50) / 100;
     return newPrice;
   }
